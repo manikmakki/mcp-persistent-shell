@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  autoheal:
+    image: willfarrell/autoheal:latest
+    container_name: autoheal
+    restart: always
+    environment:
+      AUTOHEAL_CONTAINER_LABEL: autoheal  # Monitor labelled containers with healthchecks
+      AUTOHEAL_INTERVAL: 10          # Check every 10 seconds
+      AUTOHEAL_START_PERIOD: 30      # Wait 30s before first check
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  mcp-persistent-shell:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mcp-persistent-shell:latest
+    container_name: mcp-persistent-shell
+    ports:
+      # - "127.0.0.1:3000:3000"  # Bind to localhost only for security
+      - 3000:3000  # Optional: expose to all interfaces (use with caution)
+    volumes:
+      # Persistent workspace
+      - ./workspace:/workspace
+      # Optional: Mount custom security config
+      # - ./config/security.yaml:/etc/mcp-persistent-shell/security.yaml:ro
+    environment:
+      # Server config (use nested delimiter __ for sub-configs)
+      MCP_SHELL_SERVER__HOST: "0.0.0.0"  # Inside container, bind to all interfaces
+      MCP_SHELL_SERVER__PORT: "3000"
+
+      # Logging
+      MCP_SHELL_LOGGING__LEVEL: "info"
+      MCP_SHELL_LOGGING__FORMAT: "json"
+
+      # Session config
+      MCP_SHELL_SESSION__TIMEOUT: "3600"  # 1 hour
+      MCP_SHELL_SESSION__MAX_SESSIONS: "100"
+      MCP_SHELL_SESSION__CLEANUP_INTERVAL: "300"  # 5 minutes
+
+      # Security (optional: mount config file to enable)
+      # MCP_SHELL_CONFIG_FILE: "/etc/mcp-persistent-shell/security.yaml"
+
+    restart: unless-stopped
+    user: "1000:1000"  # Run as non-root
+
+    # Resource limits (optional)
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+    labels:
+      autoheal: "true"  # Enable autoheal for this container
+
+# Create named volume for workspace persistence
+volumes:
+  workspace:

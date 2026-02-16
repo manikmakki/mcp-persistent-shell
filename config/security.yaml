@@ -1,0 +1,70 @@
+# MCP Persistent Shell - Secure Configuration
+# This configuration enables strict security mode with command allowlist
+
+security:
+  enabled: true
+
+  # Allowlist of executables (strict mode)
+  allowed_executables:
+    - ls
+    - pwd
+    - whoami
+    - date
+    - echo
+    - cat
+    - head
+    - tail
+    - grep
+    - find
+    - wc
+    - sort
+    - uniq
+    - git
+    - python3
+    - node
+    - npm
+    - curl
+    - wget
+    - mkdir
+    - touch
+    - cp
+    - mv
+    - cd
+
+  # Blocklist patterns (regex)
+  blocked_patterns:
+    - 'rm\s+.*-rf.*'          # Recursive delete
+    - 'sudo\s+.*'             # Privilege escalation
+    - 'chmod\s+(777|666)'     # Dangerous permissions
+    - '>/dev/sd[a-z]'         # Writing to disks
+    - 'curl.*\|.*sh'          # Piped execution
+    - 'wget.*\|.*sh'
+    - 'dd\s+if='               # Disk operations
+    - 'mkfs\.'                # Filesystem creation
+    - 'mount\s+'              # Mounting
+    - ':\(\)\{.*\};:'         # Fork bombs
+
+  max_execution_time: 30      # 30 seconds
+  max_output_size: 1048576    # 1MB
+  working_directory: /workspace
+  run_as_user: ""             # Empty = current user
+  audit_log: true
+
+session:
+  timeout: 3600               # 1 hour
+  max_sessions: 100
+  cleanup_interval: 300       # 5 minutes
+
+server:
+  name: mcp-persistent-shell
+  version: 0.1.0
+  host: 127.0.0.1            # Localhost only
+  port: 3000
+
+logging:
+  level: info
+  format: json
+
+shell:
+  default_shell: /bin/bash
+  prompt_marker: __MCP_SHELL_PROMPT__

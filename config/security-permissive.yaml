@@ -1,0 +1,31 @@
+# MCP Persistent Shell - Permissive Configuration
+# This configuration disables security for development/testing
+
+security:
+  enabled: false
+  allowed_executables: []
+  blocked_patterns: []
+  max_execution_time: 60
+  max_output_size: 5242880    # 5MB
+  working_directory: /workspace
+  run_as_user: ""
+  audit_log: false
+
+session:
+  timeout: 7200               # 2 hours
+  max_sessions: 50
+  cleanup_interval: 600       # 10 minutes
+
+server:
+  name: mcp-persistent-shell
+  version: 0.1.0
+  host: 127.0.0.1
+  port: 3000
+
+logging:
+  level: debug
+  format: console
+
+shell:
+  default_shell: /bin/bash
+  prompt_marker: __MCP_SHELL_PROMPT__

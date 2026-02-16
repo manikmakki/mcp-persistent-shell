@@ -1,0 +1,25 @@
+[Unit]
+Description=MCP Persistent Shell Server
+After=network.target
+
+[Service]
+Type=simple
+User=mcpuser
+Group=mcpuser
+WorkingDirectory=/opt/mcp-persistent-shell
+EnvironmentFile=/etc/mcp-persistent-shell/env
+ExecStart=/usr/local/bin/python3 -m mcp_persistent_shell
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/workspace
+
+[Install]
+WantedBy=multi-user.target
