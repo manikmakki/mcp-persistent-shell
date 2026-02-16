@@ -19,8 +19,8 @@ services:
     image: mcp-persistent-shell:latest
     container_name: mcp-persistent-shell
     ports:
-      # - "127.0.0.1:3000:3000"  # Bind to localhost only for security
-      - 3000:3000  # Optional: expose to all interfaces (use with caution)
+      - "127.0.0.1:3000:3000"  # Bind to localhost only for security
+      # - 3000:3000  # Optional: expose to all interfaces (use with caution)
     volumes:
       # Persistent workspace
       - ./workspace:/workspace
@@ -68,5 +68,5 @@ services:
       autoheal: "true"  # Enable autoheal for this container
 
 # Create named volume for workspace persistence
-volumes:
-  workspace:
+# volumes:
+#  workspace:
